@@ -7,7 +7,7 @@ const modelCategoria = require('../model/modelCategoria');
 const router = express.Router();
 
 /* ROTA DE INSERÇÃO DE CATEGORIA */
-router.post('/inserirCAtegoria', (req, res)=>{
+router.post('/inserirCategoria', (req, res)=>{
 
     let { nome_categoria} = req.body;
 
@@ -39,7 +39,7 @@ router.post('/inserirCAtegoria', (req, res)=>{
 });
 
 /* ROTA DE LISTAGEM GERAL DE CATEGORIAS */
-router.get('/listagemCateorias', (req, res)=>{
+router.get('/listagemCategoria', (req, res)=>{
 
     modelCategoria.findAll()
     .then(

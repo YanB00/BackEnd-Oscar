@@ -1,155 +1,172 @@
 const express = require('express');
-
-const modelMovie = require('../model/modelMovie');
-
 const router = express.Router();
+const modelFilme = require('../model/modelMovie'); // Importe o modelFilme
+const modelCategoria = require('../model/modelCategoria'); // Importe o modelCategoria, para usar na listagem de categorias
 
-router.get('/',(req, res)=>{
-    return res.status(200).json({status:'TESTE CONEXÃO API'});
-});
+/* ROTA DE INSERÇÃO DE FILME */
+router.post('/RegisterMovie', async (req, res) => {
+    try {
+        const { nome_filme, nome_indicado, cod_categoria } = req.body;
 
-router.post('/inserirFilme', (req, res)=>{
+        // Verifica se a categoria existe
+        const categoria = await modelCategoria.findByPk(cod_categoria);
+        if (!categoria) {
+            return res.status(400).json({
+                errorStatus: true,
+                mensageStatus: 'Categoria não encontrada'
+            });
+        }
 
-    let { cod_categoria, nome_filme,nome_indicado} = req.body;
-
-    modelMovie.create(
-        {
-
+        const novoFilme = await modelFilme.create({
+            nome_filme,
+            nome_indicado,
             cod_categoria,
-            nome_filme,
-            nome_indicado
-        }
-    )
-    .then(
-        ()=>{
-            return res.status(201).json(
-                {
-                    errorStatus:false,
-                    mensageStatus:'FILME INSERIDO COM SUCESSO'
-                }
-            );
-        }
-    )
-    .catch((error)=>{
-        return res.status(400).json(
-            {
-                errorStatus:true,
-                mensageStatus:'HOUVE UM ERRO AO INSERIR O FILME',
-                errorObject:error
-            }
-        );
-    });
+        });
+
+        return res.status(201).json({
+            errorStatus: false,
+            mensageStatus: 'FILME INSERIDO COM SUCESSO',
+            data: novoFilme
+        });
+    } catch (error) {
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO INSERIR O FILME',
+            errorObject: error
+        });
+    }
 });
 
-router.get('/listagemFilmes', (req, res)=>{
+/* ROTA DE LISTAGEM GERAL DE FILMES */
+router.get('/listagemFilmes', async (req, res) => {
+    try {
+        // Inclui os dados da categoria associada ao filme
+        const filmes = await modelFilme.findAll({
+            include: [{
+                model: modelCategoria,
+                // Especifica quais colunas da categoria devem ser incluídas
+                attributes: ['cod_categoria', 'nome_categoria']
+            }]
+        });
 
-    modelMovie.findAll()
-    .then(
-        (response)=>{
-            return res.status(201).json(
-                {
-                    errorStatus:false,
-                    mensageStatus:'FILMES LISTADOS COM SUCESSO',
-                    data:response
-                }
-            );
-        }
-    )
-    .catch((error)=>{
-        return res.status(400).json(
-            {
-                errorStatus:true,
-                mensageStatus:'HOUVE UM ERRO AO LISTAR OS FILMES',
-                errorObject:error
-            }
-        );
-    });
-});
-router.get('/listagemFilme/:cod_filme', (req, res)=>{
-
-    let { cod_filme } = req.params;
-
-    modelMovie.findByPk(cod_filme)
-    .then(
-        (response)=>{
-            return res.status(201).json(
-                {
-                    errorStatus:false,
-                    mensageStatus:'FILME RECUPERADO COM SUCESSO',
-                    data:response
-                }
-            );
-        }
-    )
-    .catch((error)=>{
-        return res.status(400).json(
-            {
-                errorStatus:true,
-                mensageStatus:'HOUVE UM ERRO AO RECUPERAR O FILME',
-                errorObject:error
-            }
-        );
-    });
-
+        return res.status(200).json({ // Altere o código de status para 200
+            errorStatus: false,
+            mensageStatus: 'FILMES LISTADOS COM SUCESSO',
+            data: filmes
+        });
+    } catch (error) {
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO LISTAR OS FILMES',
+            errorObject: error
+        });
+    }
 });
 
-router.delete('/excluirFilme/:cod_filme', (req, res)=>{
+/* ROTA DE LISTAGEM DE FILME POR CÓDIGO DE FILME */
+router.get('/listagemFilme/:cod_filme', async (req, res) => {
+    try {
+        const { cod_filme } = req.params;
 
-    let { cod_filme } = req.params;
+        // Inclui os dados da categoria associada ao filme
+        const filme = await modelFilme.findByPk(cod_filme, {
+            include: [{
+                model: modelCategoria,
+                attributes: ['cod_categoria', 'nome_categoria']
+            }]
+        });
 
-    modelMovie.destroy(
-        {where:{cod_filme}}
-    ).then(
-        ()=>{
-            return res.status(201).json(
-                {
-                    errorStatus:false,
-                    mensageStatus:'FILME EXCLUIDO COM SUCESSO'
-                }
-            );
+        if (!filme) {
+            return res.status(404).json({ // Altere o código de status para 404
+                errorStatus: true,
+                mensageStatus: 'FILME NÃO ENCONTRADO'
+            });
         }
-    )
-    .catch((error)=>{
-        return res.status(400).json(
-            {
-                errorStatus:true,
-                mensageStatus:'HOUVE UM ERRO AO EXCLUIR O FILME',
-                errorObject:error
-            }
-        );
-    });
+
+        return res.status(200).json({ // Altere o código de status para 200
+            errorStatus: false,
+            mensageStatus: 'FILME RECUPERADO COM SUCESSO',
+            data: filme
+        });
+    } catch (error) {
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO RECUPERAR O FILME',
+            errorObject: error
+        });
+    }
 });
-router.put('/alterarFilme', (req, res)=>{
 
-    let { cod_filme, nome_filme,nome_indicado} = req.body;
+/* ROTA DE EXCLUSÃO DE FILME */
+router.delete('/excluirFilme/:cod_filme', async (req, res) => {
+    try {
+        const { cod_filme } = req.params;
 
-    modelLivro.update(
-        {
-            cod_filme,
-            nome_filme,
-            nome_indicado
-        },
-        {where:{cod_filme}}
-    ).then(
-        ()=>{
-            return res.status(201).json(
-                {
-                    errorStatus:false,
-                    mensageStatus:'FILME ALTERADO COM SUCESSO'
-                }
-            );
+        const filme = await modelFilme.destroy({
+            where: { cod_filme }
+        });
+
+        if (!filme) {
+            return res.status(404).json({ // Altere o código de status para 404
+                errorStatus: true,
+                mensageStatus: 'FILME NÃO ENCONTRADO'
+            });
         }
-    )
-    .catch((error)=>{
-        return res.status(400).json(
-            {
-                errorStatus:true,
-                mensageStatus:'HOUVE UM ERRO AO ALTERAR O FILME',
-                errorObject:error
-            }
-        );
-    });
 
+        return res.status(200).json({ // Altere o código de status para 200
+            errorStatus: false,
+            mensageStatus: 'FILME EXCLUÍDO COM SUCESSO'
+        });
+    } catch (error) {
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO EXCLUIR O FILME',
+            errorObject: error
+        });
+    }
+});
+
+/* ROTA DE ALTERAÇÃO DE FILME */
+router.put('/alterarFilme/:cod_filme', async (req, res) => {
+    try {
+        const { cod_filme } = req.params;
+        const { nome_filme, nome_indicado, cod_categoria } = req.body;
+
+        // Verifica se a categoria existe
+        const categoria = await modelCategoria.findByPk(cod_categoria);
+        if (!categoria) {
+            return res.status(400).json({
+                errorStatus: true,
+                mensageStatus: 'Categoria não encontrada'
+            });
+        }
+
+        const [filmeAtualizado] = await modelFilme.update(
+            { nome_filme, nome_indicado, cod_categoria }, // Use os campos que você deseja atualizar
+            { where: { cod_filme } }
+        );
+
+        if (!filmeAtualizado) {
+            return res.status(404).json({
+                errorStatus: true,
+                mensageStatus: 'FILME NÃO ENCONTRADO'
+            });
+        }
+        // Busca o filme atualizado para retornar na resposta.
+        const filmeAtualizadoResponse = await modelFilme.findByPk(cod_filme);
+
+        return res.status(200).json({
+            errorStatus: false,
+            mensageStatus: 'FILME ALTERADO COM SUCESSO',
+            data: filmeAtualizadoResponse
+        });
+    } catch (error) {
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO ALTERAR O FILME',
+            errorObject: error
+        });
+    }
 });
 
 module.exports = router;
