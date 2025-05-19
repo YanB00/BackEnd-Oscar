@@ -1,7 +1,5 @@
 const Sequelize = require('sequelize');
-
 const connection = require('../database/database');
-
 
 const modelCategoria = connection.define(
     'tbl_categoria',
@@ -15,18 +13,16 @@ const modelCategoria = connection.define(
             type:Sequelize.STRING(100),
             allowNull:true
         },
-          createdAt: { // Adicione a coluna createdAt
+        createdAt: { 
             type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW, // Define o valor padrão para a data e hora atual
+            defaultValue: Sequelize.NOW, 
         },
-        updatedAt: { // O Sequelize também cria e atualiza o campo updatedAt
+        updatedAt: { 
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,
-            onUpdate: Sequelize.NOW,
         }
-    }
+    },
+    {tableName: 'tbl_categoria'},
 );
-
-//modelCategoria.sync({force:true});
 
 module.exports = modelCategoria;

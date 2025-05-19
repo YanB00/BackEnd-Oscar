@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const modelFilme = require('../model/modelMovie'); // Importe o modelFilme
-const modelCategoria = require('../model/modelCategoria'); // Importe o modelCategoria, para usar na listagem de categorias
+const modelFilme = require('../model/modelMovie'); 
+const modelCategoria = require('../model/modelCategoria'); 
 
 /* ROTA DE INSERÇÃO DE FILME */
-router.post('/RegisterMovie', async (req, res) => {
+router.post('/registerMovie', async (req, res) => {
     try {
         const { nome_filme, nome_indicado, cod_categoria } = req.body;
 
@@ -44,6 +44,7 @@ router.get('/listagemFilmes', async (req, res) => {
         const filmes = await modelFilme.findAll({
             include: [{
                 model: modelCategoria,
+                as: 'categoria',
                 // Especifica quais colunas da categoria devem ser incluídas
                 attributes: ['cod_categoria', 'nome_categoria']
             }]
@@ -72,6 +73,7 @@ router.get('/listagemFilme/:cod_filme', async (req, res) => {
         const filme = await modelFilme.findByPk(cod_filme, {
             include: [{
                 model: modelCategoria,
+                as: 'categoria',
                 attributes: ['cod_categoria', 'nome_categoria']
             }]
         });

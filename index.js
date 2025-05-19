@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const routesCategoria = require('./routes/routeCategoria');
 const routesFilme = require('./routes/routeMovie');
+const { modelMovie, modelCategoria } = require('./model'); 
 
 const app = express();
 

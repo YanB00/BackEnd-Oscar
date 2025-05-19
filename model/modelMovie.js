@@ -19,13 +19,7 @@ const modelMovie = connection.define(
         },
         cod_categoria: { 
             type: Sequelize.INTEGER,
-            allowNull: false, 
-            references: { 
-                model: 'tbl_categoria', 
-                key: 'cod_categoria'   
-            },
-            onUpdate: 'CASCADE',
-            onDelete: 'RESTRICT' 
+            allowNull: false,
         },
         createdAt: {
             type: Sequelize.DATE,
@@ -34,14 +28,11 @@ const modelMovie = connection.define(
         updatedAt: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,
-            onUpdate: Sequelize.NOW,
         }
     },
     {
         tableName: 'tbl_filme',
     }
 );
-
-modelMovie.sync({force: true}); 
 
 module.exports = modelMovie;
