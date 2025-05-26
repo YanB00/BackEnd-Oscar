@@ -40,17 +40,15 @@ router.post('/registerMovie', async (req, res) => {
 /* ROTA DE LISTAGEM GERAL DE FILMES */
 router.get('/listagemFilmes', async (req, res) => {
     try {
-        // Inclui os dados da categoria associada ao filme
         const filmes = await modelFilme.findAll({
             include: [{
                 model: modelCategoria,
                 as: 'categoria',
-                // Especifica quais colunas da categoria devem ser incluídas
                 attributes: ['cod_categoria', 'nome_categoria']
             }]
         });
 
-        return res.status(200).json({ // Altere o código de status para 200
+        return res.status(200).json({ 
             errorStatus: false,
             mensageStatus: 'FILMES LISTADOS COM SUCESSO',
             data: filmes
@@ -69,7 +67,6 @@ router.get('/listagemFilme/:cod_filme', async (req, res) => {
     try {
         const { cod_filme } = req.params;
 
-        // Inclui os dados da categoria associada ao filme
         const filme = await modelFilme.findByPk(cod_filme, {
             include: [{
                 model: modelCategoria,
@@ -79,13 +76,13 @@ router.get('/listagemFilme/:cod_filme', async (req, res) => {
         });
 
         if (!filme) {
-            return res.status(404).json({ // Altere o código de status para 404
+            return res.status(404).json({ 
                 errorStatus: true,
                 mensageStatus: 'FILME NÃO ENCONTRADO'
             });
         }
 
-        return res.status(200).json({ // Altere o código de status para 200
+        return res.status(200).json({ 
             errorStatus: false,
             mensageStatus: 'FILME RECUPERADO COM SUCESSO',
             data: filme
@@ -109,13 +106,13 @@ router.delete('/excluirFilme/:cod_filme', async (req, res) => {
         });
 
         if (!filme) {
-            return res.status(404).json({ // Altere o código de status para 404
+            return res.status(404).json({ 
                 errorStatus: true,
                 mensageStatus: 'FILME NÃO ENCONTRADO'
             });
         }
 
-        return res.status(200).json({ // Altere o código de status para 200
+        return res.status(200).json({ 
             errorStatus: false,
             mensageStatus: 'FILME EXCLUÍDO COM SUCESSO'
         });
@@ -134,7 +131,6 @@ router.put('/alterarFilme/:cod_filme', async (req, res) => {
         const { cod_filme } = req.params;
         const { nome_filme, nome_indicado, cod_categoria } = req.body;
 
-        // Verifica se a categoria existe
         const categoria = await modelCategoria.findByPk(cod_categoria);
         if (!categoria) {
             return res.status(400).json({
@@ -144,7 +140,7 @@ router.put('/alterarFilme/:cod_filme', async (req, res) => {
         }
 
         const [filmeAtualizado] = await modelFilme.update(
-            { nome_filme, nome_indicado, cod_categoria }, // Use os campos que você deseja atualizar
+            { nome_filme, nome_indicado, cod_categoria }, 
             { where: { cod_filme } }
         );
 

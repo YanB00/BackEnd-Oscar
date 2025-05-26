@@ -1,12 +1,9 @@
 const express = require('express');
 
-/* IMPORTA O MODEL DE LIVRO */
 const modelCategoria = require('../model/modelCategoria');
 
-/* GERECIADOR DE ROTAS */
 const router = express.Router();
 
-/* ROTA DE INSERÇÃO DE CATEGORIA */
 router.post('/inserirCategoria', (req, res)=>{
 
     let { nome_categoria} = req.body;
@@ -63,7 +60,6 @@ router.get('/listagemCategoria', (req, res)=>{
         );
     });
 
-    // return res.status(200).json({status:'TESTE DE LISTAGEM DE LIVROS!'});
 
 });
 
@@ -125,7 +121,7 @@ router.delete('/excluirCategoria/:cod_categoria', (req, res)=>{
 
 });
 
-/* ROTA DE ALTERAÇÃO DE CATEORIA */
+/* ROTA DE ALTERAÇÃO DE CATEGORIA */
 router.put('/alterarCategoria', (req, res)=>{
 
     let { cod_categoria, nome_categoria } = req.body;
