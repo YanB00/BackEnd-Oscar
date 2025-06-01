@@ -37,6 +37,44 @@ router.post('/registerMovie', async (req, res) => {
     }
 });
 
+
+/* ROTA DE LISTAGEM DE FILMES POR CATEGORIA */
+router.get('/listagemFilmes/categoria/:cod_categoria', async (req, res) => {
+    console.log(`[ROUTE LOG] Attempting to list movies for category: ${req.params.cod_categoria}`); 
+    try {
+        const { cod_categoria } = req.params;
+
+        const filmes = await modelFilme.findAll({
+            where: { cod_categoria },
+            include: [{
+                model: modelCategoria,
+                as: 'categoria',
+                attributes: ['cod_categoria', 'nome_categoria']
+            }]
+        });
+
+        if (filmes.length === 0) {
+            return res.status(404).json({
+                errorStatus: true,
+                mensageStatus: 'Nenhum filme encontrado para esta categoria.'
+            });
+        }
+
+        return res.status(200).json({
+            errorStatus: false,
+            mensageStatus: 'FILMES LISTADOS POR CATEGORIA COM SUCESSO',
+            data: filmes
+        });
+    } catch (error) {
+        console.error('[ROUTE ERROR] HOUVE UM ERRO AO LISTAR OS FILMES POR CATEGORIA:', error);
+        return res.status(400).json({
+            errorStatus: true,
+            mensageStatus: 'HOUVE UM ERRO AO LISTAR OS FILMES POR CATEGORIA',
+            errorObject: error
+        });
+    }
+});
+
 /* ROTA DE LISTAGEM GERAL DE FILMES */
 router.get('/listagemFilmes', async (req, res) => {
     try {
@@ -59,6 +97,7 @@ router.get('/listagemFilmes', async (req, res) => {
             mensageStatus: 'HOUVE UM ERRO AO LISTAR OS FILMES',
             errorObject: error
         });
+        console.log('Inside listagemFilmes/categoria route');
     }
 });
 
@@ -95,6 +134,7 @@ router.get('/listagemFilme/:cod_filme', async (req, res) => {
         });
     }
 });
+
 
 /* ROTA DE EXCLUSÃO DE FILME */
 router.delete('/excluirFilme/:cod_filme', async (req, res) => {

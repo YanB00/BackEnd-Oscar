@@ -11,7 +11,7 @@ const modelCategoria = connection.define(
         },
         nome_categoria:{
             type:Sequelize.STRING(100),
-            allowNull:true
+            allowNull:false
         },
         createdAt: { 
             type: Sequelize.DATE,

@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const connection = new Sequelize(
     'oscar',
     'root',
-    'Furia@37',
+    '',
 {
     host: 'localhost',
     port: '3306',
